@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 
 interface ICheckData {
     // name?: string;
-    Date?:string;
-    timeSlot:string;
-    user_id:mongoose.Types.ObjectId
+    Date?: string;
+    timeSlot: string;
+    user_id: mongoose.Types.ObjectId
 }
 
 const checkExist = async (data: ICheckData) => {
@@ -18,5 +18,9 @@ const createItem = async (data: ICheckData) => {
     return res
 }
 
+const insertMany = async (data: ICheckData[]) => {
+    return await Schedule.insertMany(data);
+};
 
-export default { checkExist,createItem }
+
+export default { checkExist, createItem, insertMany }

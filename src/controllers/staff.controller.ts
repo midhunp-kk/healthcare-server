@@ -79,39 +79,110 @@ export async function getData(req: Request, res: Response, next: NextFunction) {
 
 import QRCode from 'qrcode';
 
+// export async function addSchedule(req: Request, res: Response, next: NextFunction) {
+//     try {
+//         const { Date, timeSlot, assigned_by, user_id } = req.body;
+
+//         // Check if already scheduled
+//         const isAlreadyExist = await scheduleServices.checkExist({
+//             Date,
+//             timeSlot,
+//             user_id
+//         });
+
+//         if (isAlreadyExist) {
+//             return createErrorResponse(res, { message: 'Schedule already exists' }, 400);
+//         }
+
+//         // Generate QR code (e.g., based on user_id + Date + timeSlot)
+//         const qrContent = `${user_id}_${Date}_${timeSlot}`;
+//         const qr = await QRCode.toDataURL(qrContent);
+
+//         const payload = {
+//             Date,
+//             timeSlot,
+//             assigned_by,
+//             user_id,
+//             qr,
+//         };
+
+//         await scheduleServices.createItem(payload);
+//         return sendSuccessResponse(res, 'Schedule created successfully');
+//     } catch (error) {
+//         next(error);
+//     }
+// }
+
+
 export async function addSchedule(req: Request, res: Response, next: NextFunction) {
     try {
-        const { Date, timeSlot, assigned_by, user_id } = req.body;
+        const { Date: dateString, timeSlot, assigned_by, user_id, frequency } = req.body;
 
-        // Check if already scheduled
-        const isAlreadyExist = await scheduleServices.checkExist({
-            Date,
-            timeSlot,
-            user_id
-        });
-
-        if (isAlreadyExist) {
-            return createErrorResponse(res, { message: 'Schedule already exists' }, 400);
+        if (!frequency || !["daily", "weekly"].includes(frequency)) {
+            return createErrorResponse(res, { message: "Invalid frequency" }, 400);
         }
 
-        // Generate QR code (e.g., based on user_id + Date + timeSlot)
-        const qrContent = `${user_id}_${Date}_${timeSlot}`;
-        const qr = await QRCode.toDataURL(qrContent);
+        const startDate = new Date(dateString);
+        const numberOfDays = frequency === "weekly" ? 7 : 1;
+        const dateList: string[] = [];
 
-        const payload = {
-            Date,
-            timeSlot,
-            assigned_by,
-            user_id,
-            qr,
-        };
+        for (let i = 0; i < numberOfDays; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            dateList.push(date.toISOString().split("T")[0]); // YYYY-MM-DD
+        }
 
-        await scheduleServices.createItem(payload);
-        return sendSuccessResponse(res, 'Schedule created successfully');
+        // Check if any conflicting schedules exist
+        const conflictChecks = await Promise.all(
+            dateList.map((date) =>
+                scheduleServices.checkExist({ Date: date, timeSlot, user_id })
+            )
+        );
+
+        const conflictingDates = dateList.filter((_, index) => conflictChecks[index]);
+
+        if (conflictingDates.length > 0) {
+            return createErrorResponse(
+                res,
+                {
+                    message: `Schedule already exists for: ${conflictingDates.join(", ")}.`,
+                },
+                400
+            );
+        }
+
+        // No conflicts, create QR codes and prepare entries
+        const scheduleEntries = await Promise.all(
+            dateList.map(async (date) => {
+                const qrContent = `${user_id}_${date}_${timeSlot}`;
+                const qr = await QRCode.toDataURL(qrContent);
+
+                return {
+                    Date: date,
+                    timeSlot,
+                    assigned_by,
+                    user_id,
+                    qr,
+                };
+            })
+        );
+
+        // Insert all at once
+        await scheduleServices.insertMany(scheduleEntries);
+        return sendSuccessResponse(
+            res,
+            frequency === "weekly"
+                ? `${scheduleEntries.length} weekly schedules created successfully.`
+                : `Schedule for the selected day created successfully.`
+        );
+
+
+        // return sendSuccessResponse(res, `${scheduleEntries.length} schedule(s) created successfully.`);
     } catch (error) {
         next(error);
     }
 }
+
 
 
 

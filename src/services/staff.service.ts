@@ -104,20 +104,18 @@ const getItem = async (input: SampleRequestParams) => {
 
 
     const matchStage: PipelineStage.Match = {
-    $match: {
-        ...(search && {
-            $or: [
-                { dosage: searchRegex },
-                { category: searchRegex },
-                { stock: searchRegex },
-                { lowStockThreshold: searchRegex },
-                { expiryDate: searchRegex },
-                { name: searchRegex },
-            ],
-        }),
-        is_available: true, // Only fetch available staff
-    },
-};
+        $match: {
+            ...(search && {
+                $or: [
+                    { name: searchRegex },
+                    { department: searchRegex },
+                    { staff_id: searchRegex },
+                    { role: searchRegex },
+                ],
+            }),
+            is_available: true, // Only fetch available staff
+        },
+    };
 
 
     const sortStage = { $sort: sort };

@@ -193,9 +193,9 @@ const getItem = async (input: SampleRequestParams) => {
         $match: {
             ...(search && {
                 $or: [
-                    { name: searchRegex },
-                    { staff_id: searchRegex },
-                    { department: searchRegex },
+                    { Date: searchRegex },
+                    { timeSlot: searchRegex },
+                    { assigned_by: searchRegex },
                     { role: searchRegex },
                     { timeSlot: searchRegex },
                     { Date: searchRegex },

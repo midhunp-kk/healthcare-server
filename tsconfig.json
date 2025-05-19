@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "baseUrl": ".",
+        "rootDir": ".",
+        "outDir": "./dist",
+        "paths": {
+            "@/*": [
+                "*"
+            ]
+        },
+        "target": "ES6",
+        "module": "CommonJS",
+        "strict": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "./**/*",
+        "./**/*.json"
+, "lib/controllers/.controller.ts"    ],
+    "exclude": [
+        "node_modules",
+        "test",
+    ],
+    "ts-node": {
+        "require": [
+            "tsconfig-paths/register"
+        ]
+    }
+}

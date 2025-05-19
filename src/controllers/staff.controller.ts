@@ -1,5 +1,4 @@
 import { NextFunction, Response, Request } from 'express';
-// import sampleServices from '@/src/services/sample.service';
 import staffServices from '@/src/services/staff.service';
 import scheduleServices from '@/src/services/schedule.service';
 import { sendSuccessResponse } from '@/src/utils/responses/success.handler';
@@ -38,80 +37,7 @@ export async function getData(req: Request, res: Response, next: NextFunction) {
 }
 
 
-// export async function addSchedule(req: Request, res: Response, next: NextFunction) {
-//     try {
-//         const {
-//             name,
-//             dosage,
-//             category,
-//             stock,
-//             lowStockThreshold,
-//             expiryDate
-//         } = req.body;
-
-
-//         const isAlreadyExist = await staffServices.checkExist({
-//             name
-//         })
-
-//         if (isAlreadyExist) {
-//             return createErrorResponse(res, { message: 'Data Already exist' }, 400);
-//         }
-
-
-//         const Payload = {
-//             name,
-//             dosage,
-//             category,
-//             stock,
-//             lowStockThreshold,
-//             expiryDate
-//         };
-//         console.log(Payload, "Payload")
-//         await staffServices.createItem(Payload);
-//         return sendSuccessResponse(res, 'Created successfully');
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
-
-
 import QRCode from 'qrcode';
-
-// export async function addSchedule(req: Request, res: Response, next: NextFunction) {
-//     try {
-//         const { Date, timeSlot, assigned_by, user_id } = req.body;
-
-//         // Check if already scheduled
-//         const isAlreadyExist = await scheduleServices.checkExist({
-//             Date,
-//             timeSlot,
-//             user_id
-//         });
-
-//         if (isAlreadyExist) {
-//             return createErrorResponse(res, { message: 'Schedule already exists' }, 400);
-//         }
-
-//         // Generate QR code (e.g., based on user_id + Date + timeSlot)
-//         const qrContent = `${user_id}_${Date}_${timeSlot}`;
-//         const qr = await QRCode.toDataURL(qrContent);
-
-//         const payload = {
-//             Date,
-//             timeSlot,
-//             assigned_by,
-//             user_id,
-//             qr,
-//         };
-
-//         await scheduleServices.createItem(payload);
-//         return sendSuccessResponse(res, 'Schedule created successfully');
-//     } catch (error) {
-//         next(error);
-//     }
-// }
 
 
 export async function addSchedule(req: Request, res: Response, next: NextFunction) {
